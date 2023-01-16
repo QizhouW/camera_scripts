@@ -30,7 +30,7 @@ Gst.init()
 Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
 serial = 17220805
 pipeline = Gst.parse_launch("tcambin name=bin"
-                            " ! video/x-raw,format=GRAY8,width=4000,height=3000,framerate=30/1"
+                            " ! video/x-raw,format=GRAY8,width=4000,height=3000,framerate=5/1"
                             " ! videoconvert"
                             #" ! x264enc speed-preset=ultrafast tune=zerolatency byte-stream=true bitrate=9000 threads=32"
                             " ! avimux"

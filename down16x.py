@@ -29,10 +29,23 @@ file_location = f"./res/{parser.fname}.avi"
 out = cv2.VideoWriter(file_location, fourcc, 15 , (1000, 750), 0)
 container = np.zeros((750, 1000), dtype=np.uint8)
 
+
 def callback(appsink, user_data):
     sample = appsink.emit("pull-sample")
     global framecount
     #caps = sample.get_caps()
+
+def callback1(appsink, user_data):
+    """
+    This function will be called in a separate thread when our appsink
+    says there is data for us. user_data has to be defined
+    when calling g_signal_connect. It can be used to pass objects etc.
+    from your other function to the callback.
+    """
+    sample = appsink.emit("pull-sample")
+    global framecount
+    #global tmp
+    caps = sample.get_caps()
     if sample:
         gst_buffer = sample.get_buffer()
         try:
@@ -52,6 +65,38 @@ def callback(appsink, user_data):
             pass
     return Gst.FlowReturn.OK
 
+
+def callback2(appsink, user_data):
+    """
+    This function will be called in a separate thread when our appsink
+    says there is data for us. user_data has to be defined
+    when calling g_signal_connect. It can be used to pass objects etc.
+    from your other function to the callback.
+    """
+    sample = appsink.emit("pull-sample")
+    global framecount
+    #global tmp
+    caps = sample.get_caps()
+    if sample:
+        gst_buffer = sample.get_buffer()
+        try:
+            (ret, buffer_map) = gst_buffer.map(Gst.MapFlags.READ)
+            img = np.ndarray((3000, 4000), buffer=buffer_map.data, dtype=np.uint8)
+            container=skimage.measure.block_reduce(img, (4,4), np.mean)
+            container = container.astype(np.uint8)
+            #newbytes=container.tobytes('C')
+            print(framecount)
+            framecount += 1
+        except Exception as e:
+            print(e)
+        finally:
+            ## reload the buffer_map to the stream
+            gst_buffer.unmap(Gst.Buffer.new_wrapped_bytes (container.tobytes('C')))
+            pass
+    return Gst.FlowReturn.OK
+
+
+>>>>>>> dev
 print(f'wait for {parser.delay} seconds')
 time.sleep(parser.delay)
 print('starting to record')
@@ -61,7 +106,9 @@ serial = 17220805
 pipeline = Gst.parse_launch("tcambin name=source"
                             " ! video/x-raw,format=GRAY8,width=4000,height=3000,framerate=15/1"
                             " ! videoconvert"
-                            " ! appsink name=sink")
+                            " ! appsink name=appsink"
+                            #" ! filesink name=fsink"
+                            )
 
 if not pipeline:
     print("Could not create pipeline.")
@@ -71,14 +118,16 @@ if serial is not None:
     source = pipeline.get_by_name("source")
     source.set_property("serial", serial)
 
-sink = pipeline.get_by_name("sink")
+#file_location = f"./res/{parser.fname}.avi"
+#fsink = pipeline.get_by_name("fsink")
+#fsink.set_property("location", './res/hybrid.avi')
 
+sink = pipeline.get_by_name("appsink")
 sink.set_property("emit-signals", True)
-
 user_data = None
 
 # tell appsink what function to call when it notifies us
-sink.connect("new-sample", callback, user_data)
+sink.connect("new-sample", callback1, user_data)
 
 pipeline.set_state(Gst.State.PLAYING)
 
