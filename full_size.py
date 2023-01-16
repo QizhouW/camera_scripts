@@ -49,4 +49,4 @@ pipeline.set_state(Gst.State.PLAYING)
 time.sleep(parser.len)
 pipeline.set_state(Gst.State.NULL)
 
-
+print('Recording finish')

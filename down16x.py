@@ -135,4 +135,7 @@ print("Press Ctrl-C to stop.")
 time.sleep(parser.len)
 pipeline.set_state(Gst.State.NULL)
 out.release()
-print(framecount)
+print('Recording finish')
+print('total frame:',framecount)
+
+
