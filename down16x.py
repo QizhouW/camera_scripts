@@ -26,8 +26,18 @@ framecount = 0
 ccstring = 'I420'
 fourcc = cv2.VideoWriter_fourcc(*ccstring)
 file_location = f"./res/{parser.fname}.avi"
-out = cv2.VideoWriter(file_location, fourcc, 30, (1000, 750), 0)
+
+
+
+out = cv2.VideoWriter(file_location, fourcc, 15 , (1000, 750), 0)
+
 container = np.zeros((750, 1000), dtype=np.uint8)
+
+
+def callback(appsink, user_data):
+    sample = appsink.emit("pull-sample")
+    global framecount
+    #caps = sample.get_caps()
 
 def callback1(appsink, user_data):
     """
@@ -59,6 +69,7 @@ def callback1(appsink, user_data):
             pass
     return Gst.FlowReturn.OK
 
+
 def callback2(appsink, user_data):
     """
     This function will be called in a separate thread when our appsink
@@ -89,14 +100,13 @@ def callback2(appsink, user_data):
     return Gst.FlowReturn.OK
 
 
+
 print(f'wait for {parser.delay} seconds')
 time.sleep(parser.delay)
 print(f'starting to record for {parser.len} seconds')
 Gst.init()  # init gstreamer
 Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
-
 serial = 17220805
-
 pipeline = Gst.parse_launch("tcambin name=source"
                             " ! video/x-raw,format=GRAY8,width=4000,height=3000,framerate=15/1"
                             " ! videoconvert"
@@ -108,7 +118,6 @@ if not pipeline:
     print("Could not create pipeline.")
     sys.exit(1)
 
-
 if serial is not None:
     source = pipeline.get_by_name("source")
     source.set_property("serial", serial)
@@ -119,7 +128,8 @@ if serial is not None:
 
 sink = pipeline.get_by_name("appsink")
 sink.set_property("emit-signals", True)
-user_data = "This is our user data"
+user_data = None
+
 # tell appsink what function to call when it notifies us
 sink.connect("new-sample", callback1, user_data)
 
@@ -127,14 +137,11 @@ pipeline.set_state(Gst.State.PLAYING)
 
 print("Press Ctrl-C to stop.")
 
-# We wait with this thread until a
-# KeyboardInterrupt in the form of a Ctrl-C
-# arrives. This will cause the pipline
-# to be set to state NULL
 
 time.sleep(parser.len)
 pipeline.set_state(Gst.State.NULL)
 out.release()
+
 print('Recording finish')
 print('total frame:',framecount)
 
