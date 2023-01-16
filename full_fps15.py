@@ -23,9 +23,9 @@ parser.add_argument('-delay', type=int, default=10, help='waitting time till sta
 parser.add_argument('-len', type=int, default=10, help='record length')
 
 parser = parser.parse_args()
-print(f'wait for {parser.delay} seconds') 
+print(f'wait for {parser.delay} seconds')
 time.sleep(parser.delay)
-print('starting to record')
+print(f'starting to record for {parser.len} seconds')
 Gst.init() 
 Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
 serial = 17220805

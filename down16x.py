@@ -14,7 +14,7 @@ import os
 import argparse
 parser=argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-fname', type=str, default='test', help='file name (without extension)')
-parser.add_argument('-delay', type=int, default=1, help='waitting time till starting to record')
+parser.add_argument('-delay', type=int, default=5, help='waitting time till starting to record')
 parser.add_argument('-len', type=int, default=5, help='record length')
 parser = parser.parse_args()
 gi.require_version("Gst", "1.0")
@@ -26,7 +26,7 @@ framecount = 0
 ccstring = 'I420'
 fourcc = cv2.VideoWriter_fourcc(*ccstring)
 file_location = f"./res/{parser.fname}.avi"
-out = cv2.VideoWriter(file_location, fourcc, 15, (1000, 750), 0)
+out = cv2.VideoWriter(file_location, fourcc, 30, (1000, 750), 0)
 container = np.zeros((750, 1000), dtype=np.uint8)
 
 def callback1(appsink, user_data):
@@ -49,7 +49,7 @@ def callback1(appsink, user_data):
             container = container.astype(np.uint8)
             container = np.expand_dims(container, axis=2)
             out.write(container)
-            print(framecount)
+            #print(framecount)
             framecount += 1
         except Exception as e:
             print(e)
@@ -91,7 +91,7 @@ def callback2(appsink, user_data):
 
 print(f'wait for {parser.delay} seconds')
 time.sleep(parser.delay)
-print('starting to record')
+print(f'starting to record for {parser.len} seconds')
 Gst.init()  # init gstreamer
 Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
 
@@ -135,3 +135,4 @@ print("Press Ctrl-C to stop.")
 time.sleep(parser.len)
 pipeline.set_state(Gst.State.NULL)
 out.release()
+print(framecount)
