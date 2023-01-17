@@ -16,11 +16,12 @@ parser=argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpForm
 parser.add_argument('-fname', type=str, default='test', help='file name (without extension)')
 parser.add_argument('-delay', type=int, default=5, help='waitting time till starting to record')
 parser.add_argument('-len', type=int, default=5, help='record length')
+parser.add_argument('-serial', type=int, default=0, help='camera serial number')
 parser = parser.parse_args()
 gi.require_version("Gst", "1.0")
 gi.require_version("GstVideo", "1.0")
 from gi.repository import Gst, GstVideo
-
+serial = parser.serial
 tmp = None
 framecount = 0
 ccstring = 'I420'
@@ -106,7 +107,7 @@ time.sleep(parser.delay)
 print(f'starting to record for {parser.len} seconds')
 Gst.init()  # init gstreamer
 Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
-serial = 17220805
+
 pipeline = Gst.parse_launch("tcambin name=source"
                             " ! video/x-raw,format=GRAY8,width=4000,height=3000,framerate=15/1"
                             " ! videoconvert"

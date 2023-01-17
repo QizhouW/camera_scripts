@@ -19,16 +19,16 @@ import argparse
 parser=argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-fname', type=str, default='test', help='file name (without extension)')
-parser.add_argument('-delay', type=int, default=10, help='waitting time till starting to record')
-parser.add_argument('-len', type=int, default=10, help='record length')
-
+parser.add_argument('-delay', type=int, default=5, help='waitting time till starting to record')
+parser.add_argument('-len', type=int, default=5, help='record length')
+parser.add_argument('-serial', type=int, default=0, help='camera serial number')
 parser = parser.parse_args()
 print(f'wait for {parser.delay} seconds')
 time.sleep(parser.delay)
 print(f'starting to record for {parser.len} seconds')
 Gst.init() 
 Gst.debug_set_default_threshold(Gst.DebugLevel.WARNING)
-serial = 17220805
+serial = parser.serial
 pipeline = Gst.parse_launch("tcambin name=bin"
                             " ! video/x-raw,format=GRAY8,width=4000,height=3000,framerate=5/1"
                             " ! videoconvert"
