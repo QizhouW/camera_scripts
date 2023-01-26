@@ -1,1 +1,1 @@
-gst-launch-1.0 tcambin ! video/x-raw,format=GRAY8 ! videoconvert ! ximagesink
+gst-launch-1.0 tcambin ! video/x-raw,format=GRAY8 ! videoconvert ! ximagesink 
