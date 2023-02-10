@@ -55,7 +55,7 @@ camera.set_tcam_enumeration("ExposureAuto", "Off")
 camera.set_tcam_enumeration("GainAuto", "Off")
 
 
-camera.set_tcam_float("ExposureTime", 1/parser.expo)
+camera.set_tcam_float("ExposureTime", 1/parser.expo*1e6)
 camera.set_tcam_float("BlackLevel", 20.0)
 camera.set_tcam_float("Gain", 0)
 print('Exposure time:',camera.get_tcam_float("ExposureTime")/1000,'ms')
